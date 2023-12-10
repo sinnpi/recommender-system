@@ -3,6 +3,22 @@
 <div class="container">
     <h2>Movies</h2>
 
+    <!-- Add a text that shows if and for which genre we're filtering -->
+    {% if genres %}
+        <h3>Showing movies for genres: 
+            {% for genre in genres %}
+                {{ genre }}
+                <!-- Add a link to remove the genre from the filtering -->
+                <a href="{{ url_for('movies_by_genres', genres=genres|reject('equalto', genre)|join(',')) }}">[x]</a>
+            {% endfor %}
+        </h3>
+        <!-- Add a link to undo the genre filtering -->
+        <a href="{{ url_for('movies_page') }}">Show all movies</a>
+    {% else %}
+        <h3>Showing all movies</h3>
+    {% endif %}
+
+
     {% for m in movies %}
         <div class="panel panel-default">
             <div class="panel-heading"><b>{{ m.title }}</b> 
@@ -15,7 +31,9 @@
             <div class="panel-body">
                 <p>
                     {% for g in m.genres %}
-                        <span class="label label-default">{{ g.genre }}</span>
+                        <a href="{{ url_for('movies_by_genres', genres=(genres|default([])+[g.genre])|join(',')) }}">
+                            <span class="label label-{{ g.genre in genres and 'primary' or 'default' }}">{{ g.genre }}</span>
+                        </a>
                     {% endfor %}
                 </p>
             </div>
@@ -28,6 +46,15 @@
               </div>
         </div>
     {% endfor %}
+
+    <!-- navigation links -->
+    {% if movies.has_prev %}
+        <a href="{{ url_for('movies_by_genre', genre=genre, page=movies.prev_num) }}">Previous</a>
+    {% endif %}
+    {% if movies.has_next %}
+        <a href="{{ url_for('movies_by_genre', genre=genre, page=movies.next_num) }}">Next</a>
+    {% endif %}
+
 </div>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 # Contains parts from: https://flask-user.readthedocs.io/en/latest/quickstart_app.html
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, g
 from flask_user import login_required, UserManager
 from sqlalchemy.orm import joinedload
 
@@ -9,6 +9,7 @@ from models import db, User, Movie, MovieGenre, Link
 from read_data import check_and_read_data
 
 from datetime import datetime
+import time
 
 # Class-based application configuration
 class ConfigClass(object):
@@ -37,8 +38,6 @@ user_manager = UserManager(app, db, User)  # initialize Flask-User management
 
 
 def create_test_user():
-    from werkzeug.security import generate_password_hash
-
     # Test123
     hashed_password = '$2b$12$2PbFYnIt5NSfYIaVxSrxmOiDGbpvgc.RBNHhEs5QPCRYzn/bHTrfe'
     test_user = User(username='testuser', password=hashed_password)
@@ -57,6 +56,9 @@ def initdb_command():
     
     create_test_user()
 
+@app.before_request
+def start_timer():
+    g.start = time.time()
 
 # The Home page is accessible to anyone
 @app.route('/')
@@ -70,9 +72,6 @@ def home_page():
 @login_required  # User must be authenticated
 def movies_page():
     # String-based templates
-
-    # show list of genres
-    genres = MovieGenre.query.distinct(MovieGenre.genre).all()
 
     # first 10 movies
     # movies = Movie.query.limit(10).all()
@@ -98,6 +97,19 @@ def movies_page():
 
     return render_template("movies.html", movies=movies_with_links)
 
+@app.route('/movies/genres/<genres>')
+@login_required  # User must be authenticated
+def movies_by_genres(genres):
+    # split the genres parameter into a list of genres
+    genres = genres.split(',')
+
+    # get page number from query parameters (default to 1 if not provided)
+    page = request.args.get('page', 1, type=int)
+
+    # get all movies of the selected genres, paginated
+    movies = Movie.query.filter(Movie.genres.any(MovieGenre.genre.in_(genres))).limit(10).all()
+
+    return render_template("movies.html", movies=movies, genres=genres)
 
 # Start development web server
 if __name__ == '__main__':
