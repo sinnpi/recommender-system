@@ -12,8 +12,10 @@ def check_and_read_data(db):
         total = sum(1 for row in csv.reader(open('data/movies.csv', newline='', encoding='utf8'))) - 1
 
         with open('data/movies.csv', newline='', encoding='utf8') as csvfile:
+            rowcount = 0
+            dupecount = 0
+            
             reader = csv.reader(csvfile, delimiter=',')
-
             next(reader, None)  # skip the header row
             for i, row in enumerate(tqdm(reader, total=total)):
                     try:
@@ -27,15 +29,22 @@ def check_and_read_data(db):
                             db.session.add(movie_genre)
                         if i % 10 == 0:  # batch size, faster
                             db.session.commit()  # save data to database
+                        rowcount += 1
                     except IntegrityError:
-                        print("Ignoring duplicate movie: " + title)
+                        dupecount += 1
                         db.session.rollback()
                         pass
+            db.session.commit()
+        
+            print(f"{total} rows read. Added {rowcount} movies to the database. Ignored {dupecount} duplicates.")
 
     if Ratings.query.count() == 0:
         total = sum(1 for row in csv.reader(open('data/ratings.csv', newline='', encoding='utf8'))) - 1
 
         with open('data/ratings.csv', newline='', encoding='utf8') as csvfile:
+            rowcount = 0
+            dupecount = 0
+
             reader = csv.reader(csvfile, delimiter=',')
             next(reader, None) # skip the header row
             for i, row in enumerate(tqdm(reader, total=total)):
@@ -45,16 +54,23 @@ def check_and_read_data(db):
                     db.session.add(rating)
                     if i % 1000 == 0: # batch size, faster
                         db.session.commit()
+                    rowcount += 1
                 except IntegrityError:
-                    print("Ignoring duplicate rating: " + row[0] + " " + row[1])
+                    dupecount += 1
                     db.session.rollback()
                     pass
+
             db.session.commit()
+            print(f"{total} rows read. Added {rowcount} ratings to the database. Ignored {dupecount} duplicates.")
+
 
     if Tags.query.count() == 0:
         total = sum(1 for row in csv.reader(open('data/tags.csv', newline='', encoding='utf8'))) - 1
 
         with open('data/tags.csv', newline='', encoding='utf8') as csvfile:
+            rowcount = 0
+            dupecount = 0
+            unique_tag_count = 0
             reader = csv.reader(csvfile, delimiter=',')
             next(reader, None)  # skip the header row
             for i, row in enumerate(tqdm(reader, total=total)):
@@ -72,6 +88,7 @@ def check_and_read_data(db):
                         tagname = TagNames(name=tag_name)
                         db.session.add(tagname)
                         db.session.commit()  # commit immediately to get the new Tagname's ID
+                        unique_tag_count += 1
 
                     # create a new Tag with the Tagname's ID
                     tag = Tags(user_id=user_id, movie_id=movie_id, tag_id=tagname.id, timestamp=timestamp)
@@ -79,8 +96,10 @@ def check_and_read_data(db):
 
                     if i % 10 == 0:  # batch size, faster
                         db.session.commit()
+                    rowcount += 1
                 except IntegrityError:
-                    print("Ignoring duplicate tag: " + row[0] + " " + row[1] + " " + row[2])
+                    dupecount += 1
                     db.session.rollback()
                     pass
             db.session.commit()
+            print(f"{total} rows read. Added {rowcount} tags to the database. Ignored {dupecount} duplicates. {unique_tag_count} unique tags added.")
