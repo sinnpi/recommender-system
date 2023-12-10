@@ -26,7 +26,8 @@ def check_and_read_data(db):
                         for genre in genres:  # add each genre to the movie_genre table
                             movie_genre = MovieGenre(movie_id=id, genre=genre)
                             db.session.add(movie_genre)
-                        db.session.commit()  # save data to database
+                        if i % 10 == 0:  # batch size, faster
+                            db.session.commit()  # save data to database
                     except IntegrityError:
                         print("Ignoring duplicate movie: " + title)
                         db.session.rollback()
@@ -52,4 +53,4 @@ def check_and_read_data(db):
                     print("Ignoring duplicate rating: " + row[0] + " " + row[1])
                     db.session.rollback()
                     pass
-
+            db.session.commit()
