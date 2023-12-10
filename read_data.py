@@ -1,6 +1,6 @@
 import csv
 from sqlalchemy.exc import IntegrityError
-from models import Movie, MovieGenre, Ratings
+from models import Movie, MovieGenre, Ratings, TagNames, Tags
 from datetime import datetime
 from tqdm import tqdm
 
@@ -9,11 +9,10 @@ def check_and_read_data(db):
     # read data if database is empty
     if Movie.query.count() == 0:
         # read movies from csv
+        total = sum(1 for row in csv.reader(open('data/movies.csv', newline='', encoding='utf8'))) - 1
+
         with open('data/movies.csv', newline='', encoding='utf8') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
-            with open('data/movies.csv', newline='', encoding='utf8') as csvfile:
-                total = sum(1 for row in csv.reader(csvfile)) - 1
-            csvfile.close()
 
             next(reader, None)  # skip the header row
             for i, row in enumerate(tqdm(reader, total=total)):
@@ -34,13 +33,10 @@ def check_and_read_data(db):
                         pass
 
     if Ratings.query.count() == 0:
+        total = sum(1 for row in csv.reader(open('data/ratings.csv', newline='', encoding='utf8'))) - 1
+
         with open('data/ratings.csv', newline='', encoding='utf8') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
-
-            with open('data/ratings.csv', newline='', encoding='utf8') as csvfile:
-                total = sum(1 for row in csv.reader(csvfile)) - 1  # count rows in the file
-            csvfile.close()
-
             next(reader, None) # skip the header row
             for i, row in enumerate(tqdm(reader, total=total)):
                 try:
@@ -51,6 +47,40 @@ def check_and_read_data(db):
                         db.session.commit()
                 except IntegrityError:
                     print("Ignoring duplicate rating: " + row[0] + " " + row[1])
+                    db.session.rollback()
+                    pass
+            db.session.commit()
+
+    if Tags.query.count() == 0:
+        total = sum(1 for row in csv.reader(open('data/tags.csv', newline='', encoding='utf8'))) - 1
+
+        with open('data/tags.csv', newline='', encoding='utf8') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            next(reader, None)  # skip the header row
+            for i, row in enumerate(tqdm(reader, total=total)):
+                try:
+                    user_id = row[0]
+                    movie_id = row[1]
+                    tag_name = row[2]
+                    timestamp = datetime.fromtimestamp(int(row[3]))
+
+                    # check if the tag name already exists
+                    tagname = TagNames.query.filter_by(name=tag_name).first()
+
+                    if tagname is None:
+                        # if the tag name doesn't exist, create a new Tagname
+                        tagname = TagNames(name=tag_name)
+                        db.session.add(tagname)
+                        db.session.commit()  # commit immediately to get the new Tagname's ID
+
+                    # create a new Tag with the Tagname's ID
+                    tag = Tags(user_id=user_id, movie_id=movie_id, tag_id=tagname.id, timestamp=timestamp)
+                    db.session.add(tag)
+
+                    if i % 10 == 0:  # batch size, faster
+                        db.session.commit()
+                except IntegrityError:
+                    print("Ignoring duplicate tag: " + row[0] + " " + row[1] + " " + row[2])
                     db.session.rollback()
                     pass
             db.session.commit()
