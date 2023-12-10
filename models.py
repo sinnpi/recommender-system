@@ -3,6 +3,8 @@ from flask_user import UserMixin
 
 db = SQLAlchemy()
 
+MAX_URL_LENGTH = 255
+
 # Define the User data-model.
 # NB: Make sure to add flask_user UserMixin as this adds additional fields and properties required by Flask-User
 class User(db.Model, UserMixin):
@@ -54,3 +56,11 @@ class Tags(db.Model):
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
+
+class Links(db.Model):
+    __tablename__ = 'movie_links'
+    id = db.Column(db.Integer, primary_key=True)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    ml_link = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    imdb_link = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    tmdb_link = db.Column(db.String(MAX_URL_LENGTH), nullable=False)

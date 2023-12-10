@@ -1,6 +1,6 @@
 import csv
 from sqlalchemy.exc import IntegrityError
-from models import Movie, MovieGenre, Ratings, TagNames, Tags
+from models import Movie, MovieGenre, Ratings, TagNames, Tags, Links
 from datetime import datetime
 from tqdm import tqdm
 
@@ -95,6 +95,41 @@ def check_and_read_data(db):
                     db.session.add(tag)
 
                     if i % 10 == 0:  # batch size, faster
+                        db.session.commit()
+                    rowcount += 1
+                except IntegrityError:
+                    dupecount += 1
+                    db.session.rollback()
+                    pass
+            db.session.commit()
+            print(f"{total} rows read. Added {rowcount} tags to the database. Ignored {dupecount} duplicates. {unique_tag_count} unique tags added.")
+
+
+	
+    if Links.query.count() == 0:
+        total = sum(1 for row in csv.reader(open('data/links.csv', newline='', encoding='utf8'))) - 1
+
+        with open('data/links.csv', newline='', encoding='utf8') as csvfile:
+            rowcount = 0
+            dupecount = 0
+
+            reader = csv.reader(csvfile, delimiter=',')
+            next(reader, None)
+            for i, row in enumerate(tqdm(reader, total=total)):
+                try:
+                    movie_id = row[0]
+                    ml_id = row[0]
+                    imdb_id = row[1]
+                    tmdb_id = row[2]
+
+                    ml_link = f"https://movielens.org/movies/{ml_id}"
+                    imdb_link = f"https://www.imdb.com/title/{imdb_id}"
+                    tmdb_link = f"https://www.themoviedb.org/movie/{tmdb_id}"
+
+                    link = Links(movie_id=movie_id, ml_link=ml_link, imdb_link=imdb_link, tmdb_link=tmdb_link
+                                 )
+                    db.session.add(link)
+                    if i % 1000 == 0:  # batch size, faster
                         db.session.commit()
                     rowcount += 1
                 except IntegrityError:
