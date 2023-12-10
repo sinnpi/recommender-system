@@ -34,3 +34,22 @@ class MovieGenre(db.Model):
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     genre = db.Column(db.String(255), nullable=False, server_default='')
 
+class Ratings(db.Model):
+    __tablename__ = 'movie_ratings'
+    id = db.Column(db.Integer, primary_key=True)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    rating = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+
+class TagNames(db.Model):
+    __tablename__ = 'movie_tagnames'
+    id = db.Column(db.Integer, primary_key=True)
+    tag_name = db.Column(db.String(255), nullable=False)
+
+class Tags(db.Model):
+    __tablename__ = 'movie_tags'
+    id = db.Column(db.Integer, primary_key=True)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
