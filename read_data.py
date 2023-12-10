@@ -1,6 +1,6 @@
 import csv
 from sqlalchemy.exc import IntegrityError
-from models import Movie, MovieGenre, Ratings, TagNames, Tags, Links
+from models import Movie, MovieGenre, Ratings, TagNames, Tags, Link
 from datetime import datetime
 from tqdm import tqdm
 
@@ -106,7 +106,7 @@ def check_and_read_data(db):
 
 
 	
-    if Links.query.count() == 0:
+    if Link.query.count() == 0:
         total = sum(1 for row in csv.reader(open('data/links.csv', newline='', encoding='utf8'))) - 1
 
         with open('data/links.csv', newline='', encoding='utf8') as csvfile:
@@ -122,11 +122,11 @@ def check_and_read_data(db):
                     imdb_id = row[1]
                     tmdb_id = row[2]
 
-                    ml_link = f"https://movielens.org/movies/{ml_id}"
-                    imdb_link = f"https://www.imdb.com/title/{imdb_id}"
-                    tmdb_link = f"https://www.themoviedb.org/movie/{tmdb_id}"
+                    ml_url = f"https://movielens.org/movies/{ml_id}"
+                    imdb_url = f"https://www.imdb.com/title/tt{imdb_id}"
+                    tmdb_url = f"https://www.themoviedb.org/movie/{tmdb_id}"
 
-                    link = Links(movie_id=movie_id, ml_link=ml_link, imdb_link=imdb_link, tmdb_link=tmdb_link
+                    link = Link(movie_id=movie_id, ml_url=ml_url, imdb_url=imdb_url, tmdb_url=tmdb_url
                                  )
                     db.session.add(link)
                     if i % 1000 == 0:  # batch size, faster

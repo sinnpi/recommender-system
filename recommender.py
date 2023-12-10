@@ -2,8 +2,10 @@
 
 from flask import Flask, render_template
 from flask_user import login_required, UserManager
+from sqlalchemy.orm import joinedload
 
-from models import db, User, Movie, MovieGenre
+
+from models import db, User, Movie, MovieGenre, Link
 from read_data import check_and_read_data
 
 from datetime import datetime
@@ -73,7 +75,9 @@ def movies_page():
     genres = MovieGenre.query.distinct(MovieGenre.genre).all()
 
     # first 10 movies
-    movies = Movie.query.limit(10).all()
+    # movies = Movie.query.limit(10).all()
+    movies_with_links = Movie.query.options(joinedload(Movie.links)).limit(10).all()
+
 
     # only Romance movies
     # movies = Movie.query.filter(Movie.genres.any(MovieGenre.genre == 'Romance')).limit(10).all()
@@ -84,7 +88,15 @@ def movies_page():
     #     .filter(Movie.genres.any(MovieGenre.genre == 'Horror')) \
     #     .limit(10).all()
 
-    return render_template("movies.html", movies=movies)
+    # print('movies', movies, ' type: ', type(movies))
+    # # links = []
+    # # for movie in movies:
+    # #     link = Link.query.filter(Link.movie_id == movie.id).first()
+    # #     links.append(link)
+
+    # # movies = zip(movies, links)
+
+    return render_template("movies.html", movies=movies_with_links)
 
 
 # Start development web server

@@ -5,7 +5,13 @@
 
     {% for m in movies %}
         <div class="panel panel-default">
-            <div class="panel-heading"><b>{{ m.title }}</b></div>
+            <div class="panel-heading"><b>{{ m.title }}</b> 
+                {% for l in m.links[0:1] %}
+                        <a href="{{l.imdb_url}}">imdb</a>
+                        <a href="{{l.tmdb_url}}">tmdb</a>
+                        <a href="{{l.ml_url}}">movielense</a>
+                {% endfor %}
+            </div>
             <div class="panel-body">
                 <p>
                     {% for g in m.genres %}

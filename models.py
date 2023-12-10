@@ -25,10 +25,11 @@ class User(db.Model, UserMixin):
 
 class Movie(db.Model):
     __tablename__ = 'movies'
+    links = db.relationship('Link', backref='Movie')
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100, collation='NOCASE'), nullable=False, unique=True)
     genres = db.relationship('MovieGenre', backref='movie', lazy=True)
-
+    
 
 class MovieGenre(db.Model):
     __tablename__ = 'movie_genres'
@@ -57,10 +58,10 @@ class Tags(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
-class Links(db.Model):
+class Link(db.Model):
     __tablename__ = 'movie_links'
     id = db.Column(db.Integer, primary_key=True)
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
-    ml_link = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
-    imdb_link = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
-    tmdb_link = db.Column(db.String(MAX_URL_LENGTH), nullable=False)
+    ml_url = db.Column(db.String(MAX_URL_LENGTH), nullable=False, default='')
+    imdb_url = db.Column(db.String(MAX_URL_LENGTH), nullable=False, default='')
+    tmdb_url = db.Column(db.String(MAX_URL_LENGTH), nullable=False, default='')
