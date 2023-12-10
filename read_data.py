@@ -4,12 +4,15 @@ from models import Movie, MovieGenre, Ratings, TagNames, Tags, Link
 from datetime import datetime
 from tqdm import tqdm
 
+def count_rows(filename, encoding='utf8'):
+    return sum(1 for row in csv.reader(open(filename, newline='', encoding=encoding))) - 1
+
 def check_and_read_data(db):
     # check if we have movies in the database
     # read data if database is empty
     if Movie.query.count() == 0:
         # read movies from csv
-        total = sum(1 for row in csv.reader(open('data/movies.csv', newline='', encoding='utf8'))) - 1
+        total = count_rows('data/movies.csv')
 
         with open('data/movies.csv', newline='', encoding='utf8') as csvfile:
             rowcount = 0
@@ -39,7 +42,7 @@ def check_and_read_data(db):
             print(f"{total} rows read. Added {rowcount} movies to the database. Ignored {dupecount} duplicates.")
 
     if Ratings.query.count() == 0:
-        total = sum(1 for row in csv.reader(open('data/ratings.csv', newline='', encoding='utf8'))) - 1
+        total = count_rows('data/ratings.csv')
 
         with open('data/ratings.csv', newline='', encoding='utf8') as csvfile:
             rowcount = 0
@@ -65,7 +68,7 @@ def check_and_read_data(db):
 
 
     if Tags.query.count() == 0:
-        total = sum(1 for row in csv.reader(open('data/tags.csv', newline='', encoding='utf8'))) - 1
+        total = count_rows('data/tags.csv')
 
         with open('data/tags.csv', newline='', encoding='utf8') as csvfile:
             rowcount = 0
@@ -107,7 +110,7 @@ def check_and_read_data(db):
 
 	
     if Link.query.count() == 0:
-        total = sum(1 for row in csv.reader(open('data/links.csv', newline='', encoding='utf8'))) - 1
+        total = count_rows('data/links.csv')
 
         with open('data/links.csv', newline='', encoding='utf8') as csvfile:
             rowcount = 0
