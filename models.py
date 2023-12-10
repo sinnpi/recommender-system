@@ -45,11 +45,12 @@ class Ratings(db.Model):
 class TagNames(db.Model):
     __tablename__ = 'movie_tagnames'
     id = db.Column(db.Integer, primary_key=True)
-    tag_name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
 
 class Tags(db.Model):
     __tablename__ = 'movie_tags'
     id = db.Column(db.Integer, primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('movie_tagnames.id'), nullable=False)
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
