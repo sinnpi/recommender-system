@@ -24,6 +24,17 @@
       <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
     <![endif]-->
 
+    <!-- global dictionary for variables needed in multiple parts of the app -->
+    <script>
+        appConfig = {
+            urls:{
+                rate_movie: "{{ url_for('rate_movie') }}",
+                movies_by_genre: "{{ url_for('movies_by_genres') }}",
+                movies_page: "{{ url_for('movies_page') }}"
+            }
+        }
+    </script>
+
     {# *** Allow sub-templates to insert extra html to the head section *** #}
     {% block extra_css %}{% endblock %}
   </head>

@@ -22,13 +22,19 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
     last_name = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
 
+    ratings = db.relationship('Ratings', backref='User', lazy=True)
+    tags = db.relationship('Tags', backref='User', lazy=True)
+    
 
 class Movie(db.Model):
     __tablename__ = 'movies'
-    links = db.relationship('Link', backref='Movie')
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100, collation='NOCASE'), nullable=False, unique=True)
-    genres = db.relationship('MovieGenre', backref='movie', lazy=True)
+    title_stripped = db.Column(db.String(100, collation='NOCASE'), nullable=False, unique=False)
+    year = db.Column(db.Integer, nullable=False, server_default='0')
+    genres = db.relationship('MovieGenre', backref='Movie', lazy=True)
+    links = db.relationship('Link', backref='Movie')
+    tags = db.relationship('Tags', backref='Movie')
     
 
 class MovieGenre(db.Model):
@@ -53,10 +59,11 @@ class TagNames(db.Model):
 class Tags(db.Model):
     __tablename__ = 'movie_tags'
     id = db.Column(db.Integer, primary_key=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey('movie_tagnames.id'), nullable=False)
+    tag_name_id = db.Column(db.Integer, db.ForeignKey('movie_tagnames.id'), nullable=False)
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
+    tag_name = db.relationship('TagNames', backref='Tags', lazy=True)
 
 class Link(db.Model):
     __tablename__ = 'movie_links'

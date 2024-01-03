@@ -1,0 +1,30 @@
+.no-underline {
+    text-decoration: none;
+}
+.no-underline:hover {
+    text-decoration: none;
+}
+
+.btn-primary.genre {
+    background-color: #f0ad4e;
+    border-color: #f0ad4e;
+    color: #fff;
+}
+
+.btn-default.genre {
+    background-color: skyblue;
+    border-color: skyblue;
+    color: #000000;
+}
+
+.panel-footer .rating-btn.ChosenRating {
+    background-color: #f0ad4e;
+    border-color: #f0ad4e;
+    color: #fff;
+}
+
+.panel-footer .rating-btn.ChosenRating:hover {
+    background-color: #f19e29;
+    border-color: #f19e29;
+    color: #fff;
+}
