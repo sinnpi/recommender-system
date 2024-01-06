@@ -79,6 +79,11 @@ def initdb_command():
     
     create_test_user()
 
+@app.cli.command('modelbased')
+def modelbased_command():
+    import model_based
+    model_based.test(db)
+
 @app.before_request
 def start_timer():
     g.start = time.time()
