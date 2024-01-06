@@ -58,7 +58,7 @@ def check_and_read_data(db):
                     logger.debug('error: ', err)
                     # print(f"Ignoring duplicate movie id: {id} , title: {original_title}")
                     db.session.rollback()
-                    commit_problimatic_batch(db, batch,movie_with_no_year_counter=movie_with_no_year,
+                    commit_problematic_batch(db, batch,movie_with_no_year_counter=movie_with_no_year,
                                             rowcount=rowcount, dupecount=dupecount)
                     batch = []
                     pass
@@ -67,7 +67,7 @@ def check_and_read_data(db):
             except IntegrityError as err:
                 logger.debug('error: ', err)
                 db.session.rollback()
-                commit_problimatic_batch(db, batch, movie_with_no_year_counter=movie_with_no_year,
+                commit_problematic_batch(db, batch, movie_with_no_year_counter=movie_with_no_year,
                                         rowcount=rowcount, dupecount=dupecount)
                 batch = []
                 pass
@@ -225,7 +225,7 @@ def add_user(db, user_id):
     db.session.add(user)
     
 
-def commit_problimatic_batch(db, batch, rowcount, dupecount, **kwargs):
+def commit_problematic_batch(db, batch, rowcount, dupecount, **kwargs):
     # commit a batch of data that had an error,commit each row/entry individually
     # this is slower but allows us to identify the problematic row and keeps the counters accurate
     print(f'committing {len(batch)} rows individually')
