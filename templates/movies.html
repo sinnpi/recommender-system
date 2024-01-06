@@ -1,6 +1,19 @@
 {% extends "flask_user_layout.html" %}
 {% block content %}
 <div id="movies-container" class="container">
+
+    <div class="genre-filter-bar">
+        <p>Filter by Genre:</p>
+        <p>
+            {% for genre in all_genres %}
+                <a href="{{ url_for('movies_by_genres', genres=(genres|default([])+[genre])|join(',')) }}"
+                   class="no-underline">
+                    <span class="btn btn-{{ genre in genres and 'primary' or 'default' }} genre">{{ genre }}</span>
+                </a>
+            {% endfor %}
+        </p>
+    </div>
+
     <h2>Movies</h2>
 
     <!-- Add a text that shows if and for which genre we're filtering -->
@@ -22,7 +35,7 @@
     {% for m in movies %}
         <div class="panel panel-default">
             <div class="panel-heading"><b>{{ m.title_stripped }}</b> 
-                <span class="badge">{{ m.year }}</span>
+                <span class="badge"> {{ m.year }}</span>
                 {% for l in m.links[0:1] %}
                         <a href="{{l.imdb_url}}">imdb</a>
                         <a href="{{l.tmdb_url}}">tmdb</a>
@@ -50,6 +63,7 @@
                     {% endfor %}    
                 </p>
             </div>
+
               <div class="panel-footer">Rate:
                 {% for i in range(1,6) %}
                 <button type="button" class='rating-btn btn btn-primary' data-rating="{{ i }}" data-movieId="{{ m.id }}">
@@ -61,6 +75,8 @@
         </div>
 
     {% endfor %}
+
+    
 
     <!-- pagination -->
 

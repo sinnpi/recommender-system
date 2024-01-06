@@ -58,6 +58,9 @@ user_manager = UserManager(app, db, User)  # initialize Flask-User management
 MOVIES_PER_PAGE = 5
 RATING_RANGE = (0, 5)
 
+unique_genres = MovieGenre.query.with_entities(MovieGenre.genre).distinct().all()
+GENRELISTE = [genre[0] for genre in unique_genres]
+
 def create_test_user():
     # Test123
     hashed_password = '$2b$12$2PbFYnIt5NSfYIaVxSrxmOiDGbpvgc.RBNHhEs5QPCRYzn/bHTrfe'
@@ -97,8 +100,8 @@ def movies_page():
     pagination.has_next
     # print(f'movies count: {len(movies)}')
     # print(f'pagination: {pagination}')
-
-    return render_template("movies.html", movies=movies, pagination=pagination)
+    
+    return render_template("movies.html", movies=movies, pagination=pagination, all_genres=GENRELISTE)
 
 # @app.route('/movies/genres/<genres>')
 @app.route('/movies/genres')
@@ -126,7 +129,7 @@ def movies_by_genres():
     pagination = query.paginate(page=page, per_page=MOVIES_PER_PAGE, count=False, error_out=False)
     movies = pagination.items
     
-    return render_template("movies.html", movies=movies, genres=genres, pagination=pagination)
+    return render_template("movies.html", movies=movies, genres=genres, pagination=pagination, all_genres=GENRELISTE)
 
 # @app.route('/movies/int:<movie_id>')
 # @login_required  # User must be authenticated

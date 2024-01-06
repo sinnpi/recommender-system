@@ -28,3 +28,18 @@
     border-color: #f19e29;
     color: #fff;
 }
+
+.genre-filter-bar {
+    position: fixed;  /* Fixiert die Leiste an ihrer Position */
+    top: 10;          /* Positioniert die Leiste ganz oben */
+    left: 0;         /* Positioniert die Leiste am linken Rand */
+    width: 170px;    /* Breite der Filterleiste */
+    height: 100vh;   /* Höhe auf den gesamten Viewport setzen */
+    overflow-y: auto;/* Bei Bedarf scrollbar machen */
+    /* Weitere Stile für Hintergrund, Padding usw. */
+}
+
+.content {
+    margin-left: 200px; /* Platz für die Filterleiste lassen */
+    /* Weitere Stile für den Inhalt */
+}
